@@ -34,7 +34,9 @@ parser = argparse.ArgumentParser()
 parser.add_argument('--init', help='Initialize the JSON file', action='store_true')
 parser.add_argument('--edit', help='Edit the JSON file', action='store_true')
 parser.add_argument('--repo', help='Name of the repo to edit in the JSON')
+parser.add_argument('--allrepos', help='To edit all repositories', action='store_true')
 parser.add_argument('--branch', help='Branch of the repo in the JSON')
+parser.add_argument('--toversion', help='Version string to apply to products of the build process')
 parser.add_argument('--addprs', help='To add a comma-seperated list of PRs to the branch in the JSON')
 parser.add_argument('--delprs', help='To delete the list of PRs of a branch in the JSON', action='store_true')
 parser.add_argument('--display', help='Show the content of the JSON file', action='store_true')
@@ -48,6 +50,7 @@ args = parser.parse_args()
 #   ./night_build_repo.py --init
 #   ./night_build_repo.py --edit --repo aii --branch 21.12.0
 #   ./night_build_repo.py --edit --repo aii --delprs
+#   ./night_build_repo.py --edit --allrepos --toversion 22.10.0-rc2
 #   ./night_build_repo.py --delete --repo foobar
 #   ./night_build_repo.py --display
 #   ./night_build_repo.py --build
@@ -57,17 +60,17 @@ args = parser.parse_args()
 # check arguments (dependencies)
 if args.edit:
     test = 0
-    if args.repo:
-        if args.branch:
+    if args.repo and args.allrepos:
+        print("Options --repo and --allrepos are mutually exclusive!")
+        exit(1)
+    if args.repo or args.allrepos:
+        if args.branch or args.addprs or args.delprs:
             test = 1
         else:
-            if args.addprs or args.delprs:
-                test = 1
-            else:
-                print("Missing branch (--branch) OR comma-seperated list of PRs (--addprs) OR --delpars flag")
-                exit(1)
+            print("Missing branch (--branch) OR comma-seperated list of PRs (--addprs) OR --delpars flag")
+            exit(1)
     else:
-        print("With --edit flag, you must specify a repo with --repo")
+        print("With --edit flag, you must specify a repo with --repo or all with --allrepos")
         exit(1)
 if args.delete:
     if not args.repo:
@@ -101,17 +104,25 @@ if args.display:
 
 # edit json if aksed to
 if args.edit:
-    if not args.repo in repos:
-        repos[args.repo] = {}
-        repos[args.repo]['branch'] = branch_def
-        repos[args.repo]['prs'] = prs_def
-        repos[args.repo]['toversion'] = toversion_def
-    if args.branch:
-        repos[args.repo]['branch'] = args.branch
-    if args.addprs:
-        repos[args.repo]['prs'] += args.addprs.split(',')
-    if args.delprs:
-        repos[args.repo]['prs'] = []
+    if args.allrepos:
+        if args.toversion:
+            for repo in repos.keys():
+                repos[repo]['toversion'] = args.toversion
+        if args.branch:
+            for repo in repos.keys():
+                repos[repo]['branch'] = args.branch
+    else:
+        if not args.repo in repos:
+            repos[args.repo] = {}
+            repos[args.repo]['branch'] = branch_def
+            repos[args.repo]['prs'] = prs_def
+            repos[args.repo]['toversion'] = toversion_def
+        if args.branch:
+            repos[args.repo]['branch'] = args.branch
+        if args.addprs:
+            repos[args.repo]['prs'] += args.addprs.split(',')
+        if args.delprs:
+            repos[args.repo]['prs'] = []
     with open('tobuild.json', 'w') as f:
         json.dump(repos, f)
     exit()
