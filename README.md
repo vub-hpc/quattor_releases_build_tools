@@ -61,6 +61,8 @@ The specified will be added to the previous ones.
 
 ```./batch_build_repos.py --edit --repo <repo> --delprs```
 
+### Build the repositories
+
 * To build all the repositories from the JSON:
 
 ```./batch_build_repos.py --build```
@@ -73,3 +75,14 @@ The specified will be added to the previous ones.
 
 ```./batch_build_repos.py --build --only <list_of_repositories>```
 
+## Collector script
+
+Once you have succeeded in building all the repositories, you still have to collect:
+* all the RPMs;
+* all the pan templates of the libraries (core, aii, standard,...).
+
+That's the job of the collector.sh script:
+
+```./collector.sh <version_string>```
+
+When the script has finished, you find the RPMs repositories in the 'target' sub-directory, and the template libraries under the 'src' sub-directory.
