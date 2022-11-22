@@ -15,7 +15,7 @@ Inside the container:
 
 * create a gpg key: ```gpg --gen-key```
 * launch the gpg-agent in background: ```gpg-agent --daemon```
-* run the releaser script: ```./releaser.sh 22.10.1 1```
+* run the scripts described below
 
 ## Batch builder
 
@@ -60,6 +60,10 @@ The specified will be added to the previous ones.
 * To remove the PRs for a repository:
 
 ```./batch_build_repos.py --edit --repo <repo> --delprs```
+
+* To change the desired version string for all repositories:
+
+```./batch_build_repos.py --edit --allrepos --toversion <version_string>```
 
 ### Build the repositories
 
