@@ -61,6 +61,8 @@ The specified will be added to the previous ones.
 
 ```./batch_build_repos.py --edit --repo <repo> --delprs```
 
+### Build the repositories
+
 * To build all the repositories from the JSON:
 
 ```./batch_build_repos.py --build```
