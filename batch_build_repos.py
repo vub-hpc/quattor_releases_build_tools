@@ -64,7 +64,7 @@ if args.edit:
         print("Options --repo and --allrepos are mutually exclusive!")
         exit(1)
     if args.repo or args.allrepos:
-        if args.branch or args.addprs or args.delprs:
+        if args.branch or args.addprs or args.delprs or args.toversion:
             test = 1
         else:
             print("Missing branch (--branch) OR comma-seperated list of PRs (--addprs) OR --delpars flag")
