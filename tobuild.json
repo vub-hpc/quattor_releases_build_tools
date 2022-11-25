@@ -1,0 +1,70 @@
+{
+  "aii": {
+    "branch": "master",
+    "prs": [
+      299,
+      316
+    ],
+    "toversion": "21.12.1"
+  },
+  "CAF": {
+    "branch": "master",
+    "prs": [
+      257
+    ],
+    "toversion": "21.12.1"
+  },
+  "CCM": {
+    "branch": "master",
+    "prs": [],
+    "toversion": "21.12.1"
+  },
+  "cdp-listend": {
+    "branch": "master",
+    "prs": [],
+    "toversion": "21.12.1"
+  },
+  "configuration-modules-core": {
+    "branch": "master",
+    "prs": [
+      1438,
+      1452,
+      1510
+    ],
+    "toversion": "21.12.1"
+  },
+  "configuration-modules-grid": {
+    "branch": "master",
+    "prs": [],
+    "toversion": "21.12.1"
+  },
+  "LC": {
+    "branch": "master",
+    "prs": [],
+    "toversion": "21.12.1"
+  },
+  "ncm-cdispd": {
+    "branch": "master",
+    "prs": [],
+    "toversion": "21.12.1"
+  },
+  "ncm-ncd": {
+    "branch": "master",
+    "prs": [
+      124
+    ],
+    "toversion": "21.12.1"
+  },
+  "ncm-query": {
+    "branch": "master",
+    "prs": [],
+    "toversion": "21.12.1"
+  },
+  "ncm-lib-blockdevices": {
+    "branch": "master",
+    "prs": [
+      94
+    ],
+    "toversion": "21.12.1"
+  }
+}
