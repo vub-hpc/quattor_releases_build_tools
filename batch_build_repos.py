@@ -44,20 +44,29 @@ parser.add_argument('--delete', help='Delete a repo in the JSON file', action='s
 parser.add_argument('--build', help='Build the repositories', action='store_true')
 parser.add_argument('--only', help='Names of the repos to build (comma seperated list)')
 parser.add_argument('--ignore', help='Names of the repos to ignore (comma-seperated list)')
+parser.add_argument('--collect', help='To create the repo for RPMs and the template libraries', action='store_true')
 args = parser.parse_args()
 
 # examples of commands:
-#   ./night_build_repo.py --init
-#   ./night_build_repo.py --edit --repo aii --branch 21.12.0
-#   ./night_build_repo.py --edit --repo aii --delprs
-#   ./night_build_repo.py --edit --allrepos --toversion 22.10.0-rc2
-#   ./night_build_repo.py --delete --repo foobar
-#   ./night_build_repo.py --display
-#   ./night_build_repo.py --build
-#   ./night_build_repo.py --build --ignore foo,bar
-#   ./night_build_repo.py --build --onlyrepo foo,bar
+#   ./batch_build_repos.py --init
+#   ./batch_build_repos.py --edit --repo aii --branch 21.12.0
+#   ./batch_build_repos.py --edit --repo aii --delprs
+#   ./batch_build_repos.py --edit --allrepos --toversion 22.10.0-rc2
+#   ./batch_build_repos.py --delete --repo foobar
+#   ./batch_build_repos.py --display
+#   ./batch_build_repos.py --build
+#   ./batch_build_repos.py --build --ignore foo,bar
+#   ./batch_build_repos.py --build --onlyrepo foo,bar
+#   ./batch_build_repos.py --collect
 
 # check arguments (dependencies)
+if (args.edit or args.init or args.display or args.delete) and (args.build or args.collect):
+    if args.build and args.collect:
+        print("Options --build and --collect are mutually exclusive!")
+        exit(1)
+    else:
+        print("Options --build and --collect can't be used with options that changes the json!")
+        exit(1)
 if args.edit:
     test = 0
     if args.repo and args.allrepos:
@@ -137,57 +146,67 @@ if args.delete:
         json.dump(repos, f)
     exit()
 
-# if we reach this point, either the user wants to build
-# or there is nothing to do
-if not args.build:
-    print("Please specify what you want to do with options!")
-    print("If you want to build the repositories, provide --build option.")
-    exit(1)
 
-# check arguments: options --ignore and --only are mutually exclusive
-if args.ignore and args.only:
-    print("Options --ignore and --only are mutually exclusive!")
-    exit(1)
+# building the repos (results: RPMs and PAN templates)
+if args.build:
 
-# create the empty logfile for output of build processes
-logfilename = 'build_' + ts + '.log'
-with open(logfilename, 'w'): pass
+    # check arguments: options --ignore and --only are mutually exclusive
+    if args.ignore and args.only:
+        print("Options --ignore and --only are mutually exclusive!")
+        exit(1)
 
-# update of the lists of PRs (files named after the repo, used by builder.sh)
-prspath = 'prs'
-if not os.path.isdir(prspath):
-    os.mkdir(prspath)
-for repo in repos.keys():
-    prs_str = ''
-    prs = repos[repo]['prs']
-    for pr in prs:
-        prs_str = prs_str + str(pr) + ' '
-    namefic = os.path.join(prspath, repo)
-    with open(namefic, 'w') as f:
-        prs_str = prs_str[:-1]
-        f.write(prs_str)
+    # create the empty logfile for output of build processes
+    logfilename = 'build_' + ts + '.log'
+    with open(logfilename, 'w'): pass
 
-# build the repos
-with open(logfilename, 'a') as f:
-    # build list of repos to build
-    repolst = []
-    if args.only:
-        repolst = args.only.split(',')
-    elif args.ignore:
-        repostoignore = args.ignore.split(',')
-        repolst = [repo for repo in repos.keys() if repo not in repostoignore]
-    else:
-        repolst = repos.keys()
+    # update of the lists of PRs (files named after the repo, used by builder.sh)
+    prspath = 'prs'
+    if not os.path.isdir(prspath):
+        os.mkdir(prspath)
+    for repo in repos.keys():
+        prs_str = ''
+        prs = repos[repo]['prs']
+        for pr in prs:
+            prs_str = prs_str + str(pr) + ' '
+        namefic = os.path.join(prspath, repo)
+        with open(namefic, 'w') as f:
+            prs_str = prs_str[:-1]
+            f.write(prs_str)
 
-    for repo in repolst:
-        f.write("\n" + repo + "\n\n")
-        cmd = "./builder.sh " + repo + " " + repos[repo]['branch'] + " " + repos[repo]['toversion']
-        result = subprocess.Popen(cmd, shell=True)
-        opt = result.communicate()[0]
-        if opt:
-            f.write(opt + "\n\n")
-        exitcode = result.returncode
-        if exitcode == 0:
-            f.write('DONE')
+    # build the repos
+    with open(logfilename, 'a') as f:
+        # build list of repos to build
+        repolst = []
+        if args.only:
+            repolst = args.only.split(',')
+        elif args.ignore:
+            repostoignore = args.ignore.split(',')
+            repolst = [repo for repo in repos.keys() if repo not in repostoignore]
         else:
-            f.write('FAILED')
+            repolst = repos.keys()
+
+        for repo in repolst:
+            f.write("\n" + repo + "\n\n")
+            cmd = "./builder.sh " + repo + " " + repos[repo]['branch'] + " " + repos[repo]['toversion']
+            result = subprocess.Popen(cmd, shell=True)
+            opt = result.communicate()[0]
+            if opt:
+                f.write(opt + "\n\n")
+            exitcode = result.returncode
+            if exitcode == 0:
+                f.write('DONE')
+            else:
+                f.write('FAILED')
+
+# collecting things to create the repo with the RPMs and the tpl libraries
+if args.collect:
+    cmd = "./collector.sh"
+    result = subprocess.Popen(cmd, shell=True)
+    opt = result.communicate()[0]
+    if opt:
+        print(opt)
+    exitcode = result.returncode
+    if exitcode == 0:
+        print('DONE')
+    else:
+        print('FAILED')
