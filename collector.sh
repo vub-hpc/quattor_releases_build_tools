@@ -192,23 +192,24 @@ if [[ $missing_deps -gt 0 ]]; then
     exit 2
 fi
 
-# Process arguments
-if [[ -n $1 ]]; then
-    VERSION=$1
-else
-    echo_error "Version not provided"
-    exit_usage
-fi
+# # Process arguments
+# if [[ -n $1 ]]; then
+#     VERSION=$1
+# else
+#     echo_error "Version not provided"
+#     exit_usage
+# fi
+VERSION='21.12.1-SNAPSHOT'
 
-# launch gpg-agent
-gpg-agent --daemon
+# # launch gpg-agent
+# gpg-agent --daemon
 
 # Set git user and mail address
 git config --global user.name $GIT_USER_NAME
 git config --global user.email $GIT_USER_EMAIL
 
-if gpg-agent; then
-    if gpg --yes --sign $0; then
+# if gpg-agent; then
+#     if gpg --yes --sign $0; then
 
         echo_info "Cloning the rest of repositories"
         cd src/
@@ -228,14 +229,14 @@ if gpg-agent; then
 
         cd target/
 
-        echo_info "Signing RPMs"
-        rpmsign --addsign $VERSION/*.rpm
+        #echo_info "Signing RPMs"
+        #rpmsign --addsign $VERSION/*.rpm
 
         echo_info "Creating repository"
         createrepo -s sha $VERSION/
 
-        echo_info "Signing repository"
-        gpg --detach-sign --armor $VERSION/repodata/repomd.xml
+        #echo_info "Signing repository"
+        #gpg --detach-sign --armor $VERSION/repodata/repomd.xml
 
         echo_info "Creating repository tarball"
         tar -cjf quattor-$VERSION.tar.bz2 $VERSION/
@@ -267,5 +268,5 @@ if gpg-agent; then
         echo_success "---------------- Update of template-library-core successfully completed ----------------"
 
         echo_success "RELEASE COMPLETED"
-    fi
-fi
+#     fi
+# fi
