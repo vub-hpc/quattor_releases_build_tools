@@ -59,7 +59,7 @@ for dir in dirlist:
                             if found:
                                 parts = found[0].split(',')
                                 if len(parts) > 1:
-                                    tostr = rpmdict[parts[0].strip('\"')]
+                                    tostr = rpmdict[parts[0].strip('\"').strip('\'')]
                                     newline = re.sub(r'SNAPSHOT[0-9]{14}', tostr, line)
                                     tofix = 1
                                 else:
