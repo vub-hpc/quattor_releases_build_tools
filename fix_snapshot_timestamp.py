@@ -59,9 +59,13 @@ for dir in dirlist:
                             if found:
                                 parts = found[0].split(',')
                                 if len(parts) > 1:
-                                    tostr = rpmdict[parts[0].strip('\"').strip('\'')]
-                                    newline = re.sub(r'SNAPSHOT[0-9]{14}', tostr, line)
-                                    tofix = 1
+                                    pkgname = parts[0].strip('\"').strip('\'')
+                                    if pkgname in rpmdict:
+                                        tostr = rpmdict[pkgname]
+                                        newline = re.sub(r'SNAPSHOT[0-9]{14}', tostr, line)
+                                        tofix = 1
+                                    else:
+                                        newline = line
                                 else:
                                     newline = line
                             print(newline)
