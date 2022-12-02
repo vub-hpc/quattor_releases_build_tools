@@ -9,7 +9,7 @@ ADD https://codeload.github.com/quattor/template-library-core/tar.gz/master /qua
 RUN tar xvfz template-library-core-master.tar.gz
 
 # Install dependencies
-RUN yum install -y maven epel-release rpm-build createrepo rpm-sign
+RUN yum install -y maven epel-release rpm-build createrepo rpm-sign vim
 RUN rpm -U http://yum.quattor.org/devel/quattor-release-1-1.noarch.rpm
 
 # The available version of perl-Test-Quattor is too old for mvnprove.pl to

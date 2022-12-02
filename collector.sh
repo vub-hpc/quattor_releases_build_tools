@@ -192,80 +192,71 @@ if [[ $missing_deps -gt 0 ]]; then
     exit 2
 fi
 
-# Process arguments
-if [[ -n $1 ]]; then
-    VERSION=$1
-else
-    echo_error "Version not provided"
-    exit_usage
-fi
-
-# launch gpg-agent
-gpg-agent --daemon
+# # Process arguments
+# if [[ -n $1 ]]; then
+#     VERSION=$1
+# else
+#     echo_error "Version not provided"
+#     exit_usage
+# fi
 
 # Set git user and mail address
 git config --global user.name $GIT_USER_NAME
 git config --global user.email $GIT_USER_EMAIL
 
-if gpg-agent; then
-    if gpg --yes --sign $0; then
-
-        echo_info "Cloning the rest of repositories"
-        cd src/
-        for r in $REPOS_ONE_TAG $REPOS_BRANCH_TAG; do
-            if [[ ! -d $r ]]; then
-                git clone -q https://github.com/quattor/$r.git
-            fi
-        done
-        cd ..
-
-        cd $RELEASE_ROOT
-        mkdir -p target/
-
-        echo_info "Collecting RPMs"
-        mkdir -p target/$VERSION
-        find src/ -type f -name \*.rpm | grep /target/rpm/ | xargs -I @ cp @ target/$VERSION/
-
-        cd target/
-
-        echo_info "Signing RPMs"
-        rpmsign --addsign $VERSION/*.rpm
-
-        echo_info "Creating repository"
-        createrepo -s sha $VERSION/
-
-        echo_info "Signing repository"
-        gpg --detach-sign --armor $VERSION/repodata/repomd.xml
-
-        echo_info "Creating repository tarball"
-        tar -cjf quattor-$VERSION.tar.bz2 $VERSION/
-        echo_info "Repository tarball built: target/quattor-$VERSION.tar.bz2"
-
-        echo_success "---------------- YUM repositories complete ----------------"
-
-        cd $RELEASE_ROOT/src
-
-        echo_info "---------------- Updating template-library-core  ----------------"
-        clean_templates
-        echo_info "    Updating configuration module templates..."
-        publish_templates "core" "configuration-modules-core-$VERSION" && echo_info "    Published core configuration module templates"
-        publish_templates "grid" "configuration-modules-grid-$VERSION" && echo_info "    Published grid configuration module templates"
-
-        echo_info "    Remove templates for obsolete components..."
-        remove_obsolete_components
-
-        echo_info "    Updating AII templates..."
-        publish_aii "$VERSION" &&  echo_info "    AII templates successfully updated"
-
-        echo_info "    Updating Quattor version template..."
-        update_version_file "$VERSION" && echo_info "    Quattor version template sucessfully updated"
-
-        echo_info "Updating examples"
-        update_examples $VERSION
-
-
-        echo_success "---------------- Update of template-library-core successfully completed ----------------"
-
-        echo_success "RELEASE COMPLETED"
+echo_info "Cloning the rest of repositories"
+cd src/
+for r in $REPOS_ONE_TAG $REPOS_BRANCH_TAG; do
+    if [[ ! -d $r ]]; then
+        git clone -q https://github.com/quattor/$r.git
     fi
-fi
+done
+cd ..
+
+# Version will be determined after what is found in the pom.xml
+# of the repo configuration-modules-core.
+pompath='src/configuration-modules-core/pom.xml'
+VERSION=$(grep 'SNAPSHOT' $pompath | sed -e 's/version//g' | sed -e 's/[<>/ ]//g')
+
+cd $RELEASE_ROOT
+mkdir -p target/
+
+echo_info "Collecting RPMs"
+mkdir -p target/$VERSION
+find src/ -type f -name \*.rpm | grep /target/rpm/ | xargs -I @ cp @ target/$VERSION/
+
+cd target/
+
+echo_info "Creating repository"
+createrepo -s sha $VERSION/
+
+echo_info "Creating repository tarball"
+tar -cjf quattor-$VERSION.tar.bz2 $VERSION/
+echo_info "Repository tarball built: target/quattor-$VERSION.tar.bz2"
+
+echo_success "---------------- YUM repositories complete ----------------"
+
+cd $RELEASE_ROOT/src
+
+echo_info "---------------- Updating template-library-core  ----------------"
+clean_templates
+echo_info "    Updating configuration module templates..."
+publish_templates "core" "configuration-modules-core-$VERSION" && echo_info "    Published core configuration module templates"
+publish_templates "grid" "configuration-modules-grid-$VERSION" && echo_info "    Published grid configuration module templates"
+
+echo_info "    Remove templates for obsolete components..."
+remove_obsolete_components
+
+echo_info "    Updating AII templates..."
+publish_aii "$VERSION" &&  echo_info "    AII templates successfully updated"
+
+echo_info "    Updating Quattor version template..."
+update_version_file "$VERSION" && echo_info "    Quattor version template sucessfully updated"
+
+echo_info "Updating examples"
+update_examples $VERSION
+
+
+echo_success "---------------- Update of template-library-core successfully completed ----------------"
+
+echo_success "RELEASE COMPLETED"

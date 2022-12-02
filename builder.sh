@@ -77,11 +77,11 @@ function is_in_list () {
     return $found
 }
 
-# Check that HOME/.m2/settings.xml exists -> it contains the passphrase to unlock gpg key
-if [[ ! -f "$HOME/.m2/settings.xml" ]]; then
-    echo_error "Maven personal settings (~/.m2/settings.xml) is missing"
-    exit 2
-fi
+# # Check that HOME/.m2/settings.xml exists -> it contains the passphrase to unlock gpg key
+# if [[ ! -f "$HOME/.m2/settings.xml" ]]; then
+#     echo_error "Maven personal settings (~/.m2/settings.xml) is missing"
+#     exit 2
+# fi
 
 # Set git user and mail address
 git config --global user.name $GIT_USER_NAME
@@ -155,7 +155,8 @@ is_in_list $REPO "$REPOS_MVN"
 if [[ $? -eq 1 ]]; then
     echo_info "---------------- Building $REPO ----------------"
     cd $REPO
-    mvn_release > "$RELEASE_ROOT/${REPO}_build.log" 2>$1
+    #mvn_release > "$RELEASE_ROOT/${REPO}_build.log" 2>$1
+    mvn_pack > "$RELEASE_ROOT/${REPO}_build.log" 2>$1
     if [[ $? -gt 0 ]]; then
         echo_error "BUILD FAILURE"
         exit 1
