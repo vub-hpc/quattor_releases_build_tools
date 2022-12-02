@@ -79,7 +79,7 @@ The specified will be added to the previous ones.
 
 ```./batch_build_repos.py --build --only <list_of_repositories>```
 
-## Collector script
+### Collect RPMs (quattor rpm repo) and pan templates (library core)
 
 Once you have succeeded in building all the repositories, you still have to collect:
 * all the RPMs;
@@ -87,6 +87,8 @@ Once you have succeeded in building all the repositories, you still have to coll
 
 That's the job of the collector.sh script:
 
-```./collector.sh <version_string>```
+```./batch_build_repos.py --collect```
 
 When the script has finished, you find the RPMs repositories in the 'target' sub-directory, and the template libraries under the 'src' sub-directory.
+
+### Save the RPMs and the templates from library core to due locations
