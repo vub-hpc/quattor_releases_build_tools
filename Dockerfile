@@ -32,7 +32,7 @@ RUN cpanm install Git::Repository Data::Structure::Util
 ENV QUATTOR_TEST_TEMPLATE_LIBRARY_CORE /quattor/template-library-core-master
 
 #only valid in iihe's private network (no public repo for this release)
-ADD http://repos.cerberus.os/20230416/quattor_externals-el8/perl-Net-OpenNebula-0.317.0-1.el8.noarch.rpm /root/
+ADD http://repos.cerberus.os/20230416/quattor_externals-el8/perl-Net-OpenNebula-0.317.0-1.el8.noarch.rpm /quattor/perl-Net-OpenNebula-0.317.0-1.el8.noarch.rpm
 RUN yum install -y perl-Net-OpenNebula-0.317.0-1.el8.noarch.rpm
 
 # set workdir to where we'll run the tests
