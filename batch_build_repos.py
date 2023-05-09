@@ -132,6 +132,7 @@ parser.add_argument('--display', help='Show the content of the JSON file', actio
 parser.add_argument('--delete', help='Delete a repo in the JSON file', action='store_true')
 parser.add_argument('--build', help='Build the repositories', action='store_true')
 parser.add_argument('--only', help='Names of the repos to build (comma seperated list)')
+parser.add_argument('--ncmcomp', help='If you only want to compile a given ncm-component')
 parser.add_argument('--ignore', help='Names of the repos to ignore (comma-seperated list)')
 parser.add_argument('--collect', help='To create the repo for RPMs and the template libraries', action='store_true')
 parser.add_argument('--upload', help='To copy to the right locations the template libraries and the RPMs', action='store_true')
@@ -147,6 +148,7 @@ args = parser.parse_args()
 #   ./batch_build_repos.py --build
 #   ./batch_build_repos.py --build --ignore foo,bar
 #   ./batch_build_repos.py --build --onlyrepo foo,bar
+#   ./batch_build_repos.py --build --ncmcomp ncm-opennebula
 #   ./batch_build_repos.py --collect
 #   ./batch_build_repos.py --upload
 
@@ -279,6 +281,8 @@ if args.build:
         for repo in repolst:
             f.write("\n" + repo + "\n\n")
             cmd = "./builder.sh " + repo + " " + repos[repo]['branch'] + " " + repos[repo]['toversion']
+            if args.ncmcomp:
+                cmd = cmd + " " + args.ncmcomp
             result = subprocess.Popen(cmd, shell=True)
             opt = result.communicate()[0]
             if opt:
