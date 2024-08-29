@@ -27,15 +27,9 @@
   "configuration-modules-core": {
     "branch": "master",
     "prs": [
-      1438,
-      1452,
-      1510,
-      1528,
-      1582,
-      1526,
-      1567
+      1695
     ],
-    "toversion": "21.12.1"
+    "toversion": "23.6.0"
   },
   "configuration-modules-grid": {
     "branch": "master",
