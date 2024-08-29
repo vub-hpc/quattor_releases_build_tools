@@ -27,8 +27,7 @@
   "configuration-modules-core": {
     "branch": "master",
     "prs": [
-      1695,
-      1697
+      1695
     ],
     "toversion": "23.06.0"
   },
