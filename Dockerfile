@@ -31,6 +31,10 @@ RUN dnf install -y python3 maven which rpm-build panc rpm-sign createrepo ncm-li
   http://yum.quattor.org/devel/perl-Test-Quattor-18.3.0-SNAPSHOT20180406083650.noarch.rpm \
   http://yum.quattor.org/devel/aii-ks-21.12.1-SNAPSHOT20230627130118.noarch.rpm
 
+#only valid in iihe's private network (no public repo for this release)
+ADD http://repos.cerberus.os/20230416/quattor_externals-el8/perl-Net-OpenNebula-0.317.0-1.el8.noarch.rpm /quattor/perl-Net-OpenNebula-0.317.0-1.el8.noarch.rpm
+RUN yum install -y perl-Net-OpenNebula-0.317.0-1.el8.noarch.rpm
+
 # set workdir to where we'll run the tests
 WORKDIR /home
 # yum-cleanup-repos.t must be run as a non-root user. It must also resolve
